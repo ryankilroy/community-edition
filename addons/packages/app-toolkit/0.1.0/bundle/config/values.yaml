@@ -5,3 +5,4 @@ contour: {}
 cert_manager: {}
 kpack: {}
 knative_serving: {}
+cert_injection_webook: {}

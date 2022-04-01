@@ -2,10 +2,10 @@
 apiVersion: data.packaging.carvel.dev/v1alpha1
 kind: Package
 metadata:
-  name: app-toolkit.community.tanzu.vmware.com.0.1.0
+  name: app-toolkit.community.tanzu.vmware.com.0.2.0
 spec:
   refName: app-toolkit.community.tanzu.vmware.com
-  version: 0.1.0
+  version: 0.2.0
   releasedAt: 2022-02-01T14:53:24Z
   licenses:
     - "Apache 2.0"
@@ -51,3 +51,7 @@ spec:
         cert_manager:
           type: object
           default: {}
+        cert_injection_webhook:
+          type: object
+          default: {}
+          description: "cert-injection-webhook values"

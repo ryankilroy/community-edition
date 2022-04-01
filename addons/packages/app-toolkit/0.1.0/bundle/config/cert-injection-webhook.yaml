@@ -1,0 +1,29 @@
+#@ load("_exclusions.star", "exclusions")
+
+#@ if exclusions.is_pkg_enabled("cert-injection-webhook.community.tanzu.vmware.com"):
+
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+   name: cert-injection-webhook-package-install
+   namespace: tanzu-package-repo-global
+spec:
+   serviceAccountName: app-toolkit-install-sa
+   packageRef:
+      refName: cert-injection-webhook.community.tanzu.vmware.com
+      versionSelection:
+         constraints: 0.1.1
+   values:
+   - secretRef:
+        name: cert-injection-webhook-values
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cert-injection-webhook-values
+  namespace: tanzu-package-repo-global
+stringData:
+  values.yaml: #@ yaml.encode(data.values.cert_injection_webhook)
+
+#@ end
