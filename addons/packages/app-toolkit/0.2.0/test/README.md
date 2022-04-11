@@ -51,8 +51,6 @@
   ```
 
   Where:
-  - `REGISTRY_URL` is a valid OCI registry to store kpack images, like `https://index.docker.io/v1/`
-  - `REGISTRY_USERNAME` and `REGISTRY_PASSWORD` are the credentials for the specified registry.
   - `REGISTRY_TAG` is the path to the container repository where kpack build artifacts are stored. For Docker, it is username/tag, e.g. csamp/builder
   - `REGISTRY_PREFIX` is prefix for your images as they reside on the registry. For Docker, it is the username with a trailing slash, e.g. csamp/
 
