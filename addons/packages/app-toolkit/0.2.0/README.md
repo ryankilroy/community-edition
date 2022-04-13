@@ -147,6 +147,15 @@ This example illustrates creating a simple Spring Boot web app on the locally de
     tanzu unmanaged-cluster create demo-local -p 80:80 -p 443:443
     ```
 
+1. Ensure you have installed the Secretgen Controller package and set up the secrets. You can find more details in the [Preparing the secrets section](#preparing-the-secrets):
+
+    ```shell
+    tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0
+    tanzu plugin install secret
+    tanzu secret registry add registry-credentials --server https://index.docker.io/v1/ --username REGISTRY_USER --password REGISTRY_PASS --export-to-all-namespaces`
+    ```
+
+
 1. Ensure you have installed the App-toolkit package. You can find an example of the `values.yaml` above in the [installation section](#prepare-a-valuesyaml-file-for-local-docker-installation-without-load-balancer):
 
     ```shell
@@ -165,7 +174,7 @@ This example illustrates creating a simple Spring Boot web app on the locally de
     tanzu package installed list -A
     | Retrieving installed packages...
       NAME                      PACKAGE-NAME                                         PACKAGE-VERSION        STATUS               NAMESPACE
-      secretgen-controller      secretgen-controller.community.tanzu.vmware.com      0.8.0                  Reconcile succeeded  tanzu-package-repo-global
+      secretgen-controller      secretgen-controller.community.tanzu.vmware.com      0.8.0                  Reconcile succeeded  default
       app-toolkit               app-toolkit.community.tanzu.vmware.com               0.1.0                  Reconcile succeeded  tanzu-package-repo-global
       cartographer              cartographer.community.tanzu.vmware.com              0.2.2                  Reconcile succeeded  tanzu-package-repo-global
       cert-manager              cert-manager.community.tanzu.vmware.com              1.6.1                  Reconcile succeeded  tanzu-package-repo-global
