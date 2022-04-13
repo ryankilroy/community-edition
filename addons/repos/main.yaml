@@ -69,6 +69,9 @@ packages:
   - name: prometheus
     versions:
       - 2.27.0
+  - name: secretgen-controller
+    versions:
+      - 0.8.0
   - name: velero
     versions:
       - 1.6.3
