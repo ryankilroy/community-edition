@@ -3,6 +3,6 @@
 excluded_packages: []
 contour: {}
 cert_manager: {}
-developer_namespace: ""
+developer_namespace: default
 kpack: {}
 knative_serving: {}

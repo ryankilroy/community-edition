@@ -38,10 +38,54 @@ The following table shows the providers this package can work with.
 ### Prerequisites
 
 * The Tanzu CLI is installed, see [Getting Started](https://tanzucommunityedition.io/docs/v0.10/getting-started/#install-tanzu-cli).
+* The Tanzu CLI app plugin is installed, see [here](https://github.com/vmware-tanzu/apps-cli-plugin#getting-started) on how to install.
+* The Tanzu CLI secrets plugin is installed, see [Preparing the secrets](#preparing-the-secrets)
 * The Carvel ytt tool is installed, see [Installing ytt](https://carvel.dev/ytt/docs/v0.40.0/install/)
-* The following steps require the Tanzu CLI app plugin. See [here](https://github.com/vmware-tanzu/apps-cli-plugin#getting-started) on how to install.
 * You will need to provide a container registry for both `kpack` and the sample supply chain to leverage. In the examples below a free DockerHub account is shown, but you can reference the [Tanzu Community Edition kpack documentation](https://tanzucommunityedition.io/docs/v0.10/package-readme-kpack-0.5.0/) to see examples utilizing other registries.
 * A targeted Tanzu unmanaged cluster, see [Usage Example](#usage-example)
+* Tanzu secretgen-controller installed on the cluster, see [Installing the secretgen controller package](#installing-the-secretgen-controller-package)
+
+## Preparing the Secrets
+
+The secretgen controller is used by the App Toolkit to populate its placeholder secrets (i.e. `registry-credentials`) for the workload service account. Therefore, it needs to be installed and used to generate the credentials before the App Toolkit package is installed.
+
+### Installing the secretgen controller package
+
+Confirm the `secretgen controller` is available in your cluster's packages:
+`tanzu package available list`
+
+You should something like:
+`secretgen-controller.community.tanzu.vmware.com     secretgen-controller     Secret generation and sharing     0.8.0`
+
+If not, please double check you're using TCE version 0.12.0 or later.
+
+You can then install the package with:
+`tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0`
+
+### Installing the tanzu-cli secrets plugin
+
+Confirm the `secrets` plugin is available in your cluster's packages:
+`tanzu plugin list`
+
+You should something like:
+`secret     Tanzu secret management     Standalone     default-local     v0.11.2`
+
+If not, please update your tanzu cli to the latest version.
+
+You can then install the plugin with:
+`tanzu plugin install secret`
+
+### Preparing the registry-credentials secret
+
+It is worth noting that by doing this step, you will be exposing the registry-credentials to all namespaces. We include these instructions with the intention to get you started quickly in a local or development environment. If you intend to use this outside your development cluster, it is recommended you are more explicit in managing the namespaces which can access your credentials. You can read more in the [Secretgen Controller docs](https://github.com/vmware-tanzu/carvel-secretgen-controller/blob/develop/docs/README.md).
+
+This secret will be used by the supplychain to upload your workload's image builds to a OCI compliant repository. You can create the secret with the following command:
+`tanzu secret registry add registry-credentials --server REGISTRY_URL --username REGISTRY_USER --password REGISTRY_PASS --export-to-all-namespaces`
+
+`REGISTRY_URL`: url for the registry you plan to upload your builds to (e.g., `https://index.docker.io/v1/` for DockerHub)
+`REGISTRY_USER`: the username for the account with write access to the registry specified with `REGISTRY_URL`
+`REGISTRY_PASS`: the password for the same account. If you have special characters in your password, you'll want to double check that the credential is populated correctly. You can also use the `--pasword-env-var`, `--password-file`, or `--password-stdin` options to provide your password if you prefer
+
 
 ### Prepare a values.yaml file for local Docker installation without load balancer
 
@@ -98,6 +142,15 @@ This example illustrates creating a simple Spring Boot web app on the locally de
     tanzu unmanaged-cluster create demo-local -p 80:80 -p 443:443
     ```
 
+1. Ensure you have installed the Secretgen Controller package and set up the secrets. You can find more details in the [Preparing the secrets section](#preparing-the-secrets):
+
+    ```shell
+    tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0
+    tanzu plugin install secret
+    tanzu secret registry add registry-credentials --server https://index.docker.io/v1/ --username REGISTRY_USER --password REGISTRY_PASS --export-to-all-namespaces`
+    ```
+
+
 1. Ensure you have installed the App-toolkit package. You can find an example of the `values.yaml` above in the [installation section](#prepare-a-valuesyaml-file-for-local-docker-installation-without-load-balancer):
 
     ```shell
@@ -116,6 +169,7 @@ This example illustrates creating a simple Spring Boot web app on the locally de
     tanzu package installed list -A
     | Retrieving installed packages...
       NAME                      PACKAGE-NAME                                         PACKAGE-VERSION        STATUS               NAMESPACE
+      secretgen-controller      secretgen-controller.community.tanzu.vmware.com      0.8.0                  Reconcile succeeded  default
       app-toolkit               app-toolkit.community.tanzu.vmware.com               0.1.0                  Reconcile succeeded  tanzu-package-repo-global
       cartographer              cartographer.community.tanzu.vmware.com              0.2.2                  Reconcile succeeded  tanzu-package-repo-global
       cert-manager              cert-manager.community.tanzu.vmware.com              1.6.1                  Reconcile succeeded  tanzu-package-repo-global
@@ -130,10 +184,6 @@ This example illustrates creating a simple Spring Boot web app on the locally de
 
     ```yaml
     kpack:
-      registry:
-        url: <REGISTRY_URL>
-        username: <REGISTRY_USERNAME>
-        password: <REGISTRY_PASSWORD>
       builder:
         # path to the container repository where kpack build artifacts are stored
         tag: <REGISTRY_TAG>
@@ -151,8 +201,6 @@ This example illustrates creating a simple Spring Boot web app on the locally de
     ```
 
     Where:
-    * `<REGISTRY_URL>` is a valid OCI registry to store kpack images. For DockerHub this would be `https://index.docker.io/v1/`
-    * `<REGISTRY_USERNAME>` and `REGISTRY_PASSWORD` are the credentials for the specified registry.
     * `<REGISTRY_TAG>` is the path to the container repository where kpack build artifacts are stored. For DockerHub, it is username/tag, e.g. csamp/builder
     * `<REGISTRY_PREFIX>` is the prefix for your images as they reside on the registry. For DockerHub, it is the username followed by a trailing slash, e.g. csamp/
 

@@ -30,10 +30,6 @@
 
   ```yaml
   kpack:
-    registry:
-      url: [REGISTRY_URL]
-      username: [REGISTRY_USERNAME]
-      password: [REGISTRY_PASSWORD]
     builder:
       # path to the container repository where kpack build artifacts are stored
       tag: [REGISTRY_TAG]
