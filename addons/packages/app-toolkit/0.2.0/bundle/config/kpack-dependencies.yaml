@@ -30,6 +30,6 @@ metadata:
   name: kpack-dependencies-values
   namespace: tanzu-package-repo-global
 stringData:
-  values.yaml: #@ yaml.encode(data.values.kpack_dependencies)
+  values.yaml: #@ "kp_default_repository: " + data.values.kpack.kp_default_repository
 
 #@ end

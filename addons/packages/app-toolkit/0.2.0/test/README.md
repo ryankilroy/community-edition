@@ -20,10 +20,6 @@
     kp_default_repository: [DEFAULT_REGISTRY_URL]
     kp_default_repository_username: [DEFAULT_REGISTRY_USERNAME]
     kp_default_repository_password: [DEFAULT_REGISTRY_PASSWORD]
-  
-  kpack_dependencies:
-    # name of registry secret where build artifacts are stored
-    kp_default_repository: [DEFAULT_REGISTRY_URL]
   ```
 
   Where:

@@ -66,9 +66,6 @@ kpack:
   kp_default_repository: https://index.docker.io/v1/
   kp_default_repository_username: [your username]
   kp_default_repository_password: [your password]
-
-kpack_dependencies:
-  kp_default_repository: https://index.docker.io/v1/
 ```
 
 ### Install App-toolkit using the custom values file
