@@ -13,8 +13,8 @@ metadata:
 spec:
   serviceAccountName: app-toolkit-install-sa
   packageRef:
-    refName: cartographer.carto.run
+    refName: cartographer.community.tanzu.vmware.com
     versionSelection:
-      constraints: 0.2.2
+      constraints: 0.3.0
 
 #@ end
