@@ -1,0 +1,42 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:yaml", "yaml")
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: #@ data.values.developer_namespace
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-credentials
+  namespace: #@ data.values.developer_namespace
+  annotations:
+    secretgen.carvel.dev/image-pull-secret: ""
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: e30K
+---
+apiVersion: v1 
+kind: ServiceAccount
+metadata:
+  name: #@ data.values.catographer_catalog.service_account
+  namespace: #@ data.values.developer_namespace
+secrets:
+- name: registry-credentials
+imagePullSecrets:
+- name: registry-credentials
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ootb-supply-chain-source-to-url-workload
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ootb-supply-chain-source-to-url-workload
+subjects:
+  - kind: ServiceAccount
+    name: #@ data.values.catographer_catalog.service_account
+    namespace: #@ data.values.developer_namespace
