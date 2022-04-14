@@ -1,0 +1,8 @@
+#@data/values
+---
+excluded_packages: []
+contour: {}
+cert_manager: {}
+kpack: {}
+kpack_dependencies: {}
+knative_serving: {}
