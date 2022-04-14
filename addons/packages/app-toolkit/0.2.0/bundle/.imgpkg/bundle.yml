@@ -1,0 +1,15 @@
+apiVersion: imgpkg.carvel.dev/v1alpha1
+kind: Bundle
+metadata:
+  name: app-toolkit
+authors:
+- name: Michael Stergianis
+  email: mstergianis@vmware.com
+- name: Chris Samp
+  email: csamp@vmware.com
+- name: Mateo Gonzalez
+  email: gmateo@vmware.com
+- name: Ryan Kilroy
+  email: rycollins@gmail.com
+websites:
+- url: https://github.com/vmware-tanzu/community-edition/
