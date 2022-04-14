@@ -23,10 +23,9 @@ spec:
         name: cartographer-catalog-values
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: ootb-supply-chain-source-to-url-workload
-  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -34,7 +33,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: workload-user-sa
-    namespace: default
+    namespace: #@ data.values.developer_namespace
   - kind: ServiceAccount
     name: default
     namespace: default
