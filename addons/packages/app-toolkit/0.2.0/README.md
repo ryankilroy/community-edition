@@ -57,13 +57,19 @@ contour:
     hostPorts:
       enable: true
 
+cartographer_catalog:
+  registry:
+    server: index.docker.io
+    repository: my-org
+  service_account: workload-user-sa
+
 knative_serving:
   domain:
     type: real
     name: 127-0-0-1.sslip.io
 
 kpack:
-  kp_default_repository: https://index.docker.io/v1/
+  kp_default_repository: index.docker.io/my-org/app-toolkit-kpack
   kp_default_repository_username: [your username]
   kp_default_repository_password: [your password]
 ```

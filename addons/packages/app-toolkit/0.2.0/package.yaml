@@ -14,7 +14,7 @@ spec:
       fetch:
         - imgpkgBundle:
             #TODO: Swap this out for a projects.registry.vmware.com/tce image once
-            image: index.docker.io/ryanmattcollins/apptoolkit-dev-bundle@sha256:bab61b79dc7e8ef18ad81411757f14153a1c00fa388ac5a85f32d43a67b28e5a
+            image: index.docker.io/ryanmattcollins/apptoolkit-dev-bundle@sha256:c520c32915a4c27d37d4ee562c7f404d56a3a60a0e30239b7912a3796558757b
       template:
         - ytt:
             paths:
@@ -41,6 +41,10 @@ spec:
           type: object
           default: {}
           description: "contour values"
+        cartographer_catalog:
+          type: object
+          default: {}
+          description: "cartographer_catalog values"
         developer_namespace:
           type: string
           default: default
