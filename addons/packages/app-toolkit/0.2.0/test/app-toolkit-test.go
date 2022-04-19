@@ -17,7 +17,7 @@ import (
 	"github.com/creack/pty"
 )
 
-const workloadURL = "http://tanzu-simple-web-app.default.127-0-0-1.sslip.io/"
+const workloadURL = "http://tanzu-simple-web-app.test-namespace.127-0-0-1.sslip.io/"
 
 func main() {
 	fmt.Println("STARTING TEST")
@@ -29,10 +29,10 @@ func main() {
 	fmt.Println("\nTEST STEP Executable check")
 	validateCommand("tanzu", "Tanzu CLI")
 	validateCommand("tanzu apps", "Applications on Kubernetes")
+	validateCommand("tanzu secret", "Tanzu secrets cli")
 	validateCommand("tanzu package", "Tanzu package management")
 	validateCommand("kubectl", "kubectl controls the Kubernetes cluster manager")
 	validateCommand("docker", "A self-sufficient runtime for containers")
-	validateCommand("ytt version", "ytt version")
 	fmt.Println("TEST STEP Executable check OK")
 
 	fmt.Println("\nTEST STEP Install TCE and wait for ready")
@@ -40,19 +40,20 @@ func main() {
 	pollCommand("kubectl get nodes", " Ready", 10)
 	fmt.Println("TEST STEP Install TCE and wait for ready OK")
 
+	fmt.Println("\nTEST STEP Prepare Secrets")
+	runCommand("tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0")
+	runCommand("export REGISTRY_SERVER=$(grep server: app-toolkit-values.yaml | awk '{print $2}')")
+	runCommand("export REGISTRY_USER=$(grep kp_default_repository_username: app-toolkit-values.yaml | awk '{print $2}')")
+	runCommand("export REGISTRY_PASS=$(grep kp_default_repository_password: app-toolkit-valuesvalues.yaml | awk '{print $2}')")
+	runCommand("tanzu secret registry add registry-credentials --server $REGISTRY_SERVER --username $REGISTRY_USER --password $REGISTRY_PASS --export-to-all-namespaces --yes"
+	fmt.Println("TEST STEP Prepare Secrets")
+
 	fmt.Println("\nTEST STEP Install app-toolkit")
-	runCommand("tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.1.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml")
+	//TODO: remove when we can use the official package repository
+	runCommand("tanzu package repository update projects.registry.vmware.com-tce-main-v0.11.0 -n tanzu-package-repo-global --url http://index.docker.io/ryanmattcollins/main@sha256:52da5141d10490fa755fb90e56141653160d8af2a9c0b3a37bf1acfd802cfc8b")
+	runCommand("tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.2.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml")
 	runCommand("/bin/bash wait_for_app_toolkit.sh")
 	fmt.Println("TEST STEP Install app-toolkit OK")
-
-	fmt.Println("\nTEST STEP Install supply chain")
-	runCommand("ytt --data-values-file supplychain-example-values.yaml --ignore-unknown-comments -f example_sc/developer-namespace.yaml --dangerous-emptied-output-directory test_sc")
-	runCommand("ytt --data-values-file supplychain-example-values.yaml --ignore-unknown-comments -f example_sc/supplychain-templates.yaml --output-files test_sc")
-	runCommand("ytt --data-values-file supplychain-example-values.yaml --ignore-unknown-comments -f example_sc/supplychain.yaml --output-files test_sc")
-	runCommand("kubectl apply -f test_sc/developer-namespace.yaml")
-	runCommand("kubectl apply -f test_sc/supplychain-templates.yaml")
-	runCommand("kubectl apply -f test_sc/supplychain.yaml")
-	fmt.Println("TEST STEP Install supply chain OK")
 
 	fmt.Println("\nTEST STEP Install workload")
 	runCommand("tanzu apps workload create --yes -f workload.yaml")
