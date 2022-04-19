@@ -1,0 +1,6 @@
+set +x
+
+./reset-cluster $1
+./setup-secret
+./install-app-toolkit
+./create-workload

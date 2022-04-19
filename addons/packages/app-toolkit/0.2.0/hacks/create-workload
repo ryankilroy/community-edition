@@ -1,0 +1,2 @@
+namespace=$(kubectl get serviceaccount -A | grep workload-user-sa | awk '{print $1}')
+tanzu apps workload create tanzu-simple-web-app --git-repo https://github.com/cgsamp/tanzu-simple-web-app --git-branch main --label apps.tanzu.vmware.com/workload-type=web --yes --tail -n $namespace

@@ -1,0 +1,5 @@
+tanzu uc delete demo-local
+tanzu uc create demo-local -p 80:80 -p 443:443
+if [ $# -eq 1 ]; then
+  tanzu package repository update projects.registry.vmware.com-tce-main-v0.11.0 -n tanzu-package-repo-global --url $1
+fi

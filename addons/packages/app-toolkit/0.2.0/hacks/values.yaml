@@ -1,0 +1,24 @@
+contour:
+  envoy:
+    service:
+      type: ClusterIP
+    hostPorts:
+      enable: true
+
+developer_namespace: "dev-test"
+
+knative_serving:
+  domain:
+    type: real
+    name: 127-0-0-1.sslip.io
+
+kpack:
+  kp_default_repository: index.docker.io/ryanmattcollins/app-toolkit-kpack
+  kp_default_repository_username: ryanmattcollins
+  kp_default_repository_password: PASSWORD
+
+cartographer_catalog:
+  service_account: workload-user-sa
+  registry:
+    server: index.docker.io
+    repository: ryanmattcollins
