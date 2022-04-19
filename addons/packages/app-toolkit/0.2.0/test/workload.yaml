@@ -7,6 +7,6 @@ metadata:
 spec:
   source:
     git:
-      url: https://github.com/cgsamp/tanzu-simple-web-app
+      url: https://github.com/vmware-tanzu/application-toolkit-sample-app
       ref:
         branch: main

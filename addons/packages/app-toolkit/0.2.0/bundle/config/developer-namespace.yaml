@@ -21,7 +21,7 @@ data:
 apiVersion: v1 
 kind: ServiceAccount
 metadata:
-  name: #@ data.values.cartographer_catalog.service_account
+  name: default
   namespace: #@ data.values.developer_namespace
 secrets:
 - name: registry-credentials
@@ -38,5 +38,5 @@ roleRef:
   name: ootb-supply-chain-source-to-url-workload
 subjects:
   - kind: ServiceAccount
-    name: #@ data.values.cartographer_catalog.service_account
+    name: default
     namespace: #@ data.values.developer_namespace
