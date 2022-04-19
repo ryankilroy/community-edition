@@ -29,7 +29,7 @@ func main() {
 	fmt.Println("\nTEST STEP Executable check")
 	validateCommand("tanzu", "Tanzu CLI")
 	validateCommand("tanzu apps", "Applications on Kubernetes")
-	validateCommand("tanzu secret", "Tanzu secrets cli")
+	validateCommand("tanzu secret", "Tanzu secret management")
 	validateCommand("tanzu package", "Tanzu package management")
 	validateCommand("kubectl", "kubectl controls the Kubernetes cluster manager")
 	validateCommand("docker", "A self-sufficient runtime for containers")
@@ -45,7 +45,7 @@ func main() {
 	runCommand("export REGISTRY_SERVER=$(grep server: app-toolkit-values.yaml | awk '{print $2}')")
 	runCommand("export REGISTRY_USER=$(grep kp_default_repository_username: app-toolkit-values.yaml | awk '{print $2}')")
 	runCommand("export REGISTRY_PASS=$(grep kp_default_repository_password: app-toolkit-valuesvalues.yaml | awk '{print $2}')")
-	runCommand("tanzu secret registry add registry-credentials --server $REGISTRY_SERVER --username $REGISTRY_USER --password $REGISTRY_PASS --export-to-all-namespaces --yes"
+	runCommand("tanzu secret registry add registry-credentials --server $REGISTRY_SERVER --username $REGISTRY_USER --password $REGISTRY_PASS --export-to-all-namespaces --yes")
 	fmt.Println("TEST STEP Prepare Secrets")
 
 	fmt.Println("\nTEST STEP Install app-toolkit")

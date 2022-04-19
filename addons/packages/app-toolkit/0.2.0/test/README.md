@@ -26,28 +26,4 @@
   - `DEFAULT_REGISTRY_URL` is a valid OCI registry to store kpack images, like `https://index.docker.io/v1/`
   - `DEFAULT_REGISTRY_USERNAME` and `DEFAULT_REGISTRY_PASSWORD` are the credentials for the specified registry.
 
-- A `supplychain-example-values.yaml` file containing the following informaiton:
-
-  ```yaml
-  kpack:
-    builder:
-      # path to the container repository where kpack build artifacts are stored
-      tag: [REGISTRY_TAG]
-    # A comma-separated list of languages e.g. [java,nodejs] that will be supported for development
-    # Allowed values are:
-    # - java
-    # - nodejs
-    # - dotnet-core
-    # - go
-    # - ruby
-    # - php
-    languages: [java]
-    image_prefix: [REGISTRY_PREFIX]
-
-  ```
-
-  Where:
-  - `REGISTRY_TAG` is the path to the container repository where kpack build artifacts are stored. For Docker, it is username/tag, e.g. csamp/builder
-  - `REGISTRY_PREFIX` is prefix for your images as they reside on the registry. For Docker, it is the username with a trailing slash, e.g. csamp/
-
-After creating two files with the required fields, you can start the actual test execution with this command: `go run app-toolkit-test.go`
+After creating the file with the required fields, you can start the actual test execution with this command: `go run app-toolkit-test.go`
