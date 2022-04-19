@@ -9,7 +9,14 @@
         type: ClusterIP
       hostPorts:
         enable: true
+  
+  cartographer_catalog:
+    registry:
+      server: [REGISTRY_SERVER]
+      repository: [REGISTRY_REPOSITORY]
 
+  developer_namespace: "dev-test"
+  
   knative_serving:
     domain:
       type: real
@@ -23,7 +30,8 @@
   ```
 
   Where:
-  - `DEFAULT_REGISTRY_URL` is a valid OCI registry to store kpack images, like `https://index.docker.io/v1/`
+  - `REGISTRY_SERVER` and `DEFAULT_REGISTRY_URL` are valid OCI registries to store kpack images, like `https://index.docker.io/v1/`
+  - `REGISTRY_REPOSITORY` is the repository name (i.e., on Dockerhub, this is likely your username)
   - `DEFAULT_REGISTRY_USERNAME` and `DEFAULT_REGISTRY_PASSWORD` are the credentials for the specified registry.
 
 After creating the file with the required fields, you can start the actual test execution with this command: `go run app-toolkit-test.go`
