@@ -25,6 +25,8 @@ kind: ServiceAccount
 metadata:
   name: default
   namespace: #@ data.values.developer_namespace
+  annotations:
+    kapp.k14s.io/create-strategy: fallback-on-update
 secrets:
 - name: registry-credentials
 imagePullSecrets:

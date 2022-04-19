@@ -42,7 +42,7 @@ func main() {
 
 	fmt.Println("\nTEST STEP Prepare Secrets")
 	//TODO: remove when we can use the official package repository
-	runCommand("tanzu package repository update projects.registry.vmware.com-tce-main-v0.11.0 -n tanzu-package-repo-global --url index.docker.io/ryanmattcollins/main@sha256:7be82022b90ef573e0e52946cfec9e59132a4f1800074ec62ec5179acd0a6797")
+	runCommand("tanzu package repository update projects.registry.vmware.com-tce-main-v0.11.0 -n tanzu-package-repo-global --url index.docker.io/ryanmattcollins/main@sha256:c7eda1633404d8601d710d1ad98df31900bf4787d6031598b83a826c5917a5ea")
 	runCommand("tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0")
 	runCommand("/bin/bash setup_registry_secret.sh")
 	validateCommand("tanzu secret registry list", "registry-credentials")
