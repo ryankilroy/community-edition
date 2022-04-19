@@ -14,7 +14,7 @@ spec:
       fetch:
         - imgpkgBundle:
             #TODO: Swap this out for a projects.registry.vmware.com/tce image once
-            image: index.docker.io/ryanmattcollins/apptoolkit-dev-bundle@sha256:a3180f147685f2c6ec9591c163cfddf6dd4512203907041b29cf79c6b91cc8c2
+            image: index.docker.io/ryanmattcollins/apptoolkit-dev-bundle@sha256:0ef764984c96c92c858473c292bdcfdd73759c5cab4bd74d10e11e7abf28ca27
       template:
         - ytt:
             paths:
