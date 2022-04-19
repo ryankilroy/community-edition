@@ -41,6 +41,8 @@ func main() {
 	fmt.Println("TEST STEP Install TCE and wait for ready OK")
 
 	fmt.Println("\nTEST STEP Prepare Secrets")
+	//TODO: remove when we can use the official package repository
+	runCommand("tanzu package repository update projects.registry.vmware.com-tce-main-v0.11.0 -n tanzu-package-repo-global --url http://index.docker.io/ryanmattcollins/main@sha256:52da5141d10490fa755fb90e56141653160d8af2a9c0b3a37bf1acfd802cfc8b")
 	runCommand("tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0")
 	runCommand("export REGISTRY_SERVER=$(grep server: app-toolkit-values.yaml | awk '{print $2}')")
 	runCommand("export REGISTRY_USER=$(grep kp_default_repository_username: app-toolkit-values.yaml | awk '{print $2}')")
@@ -49,8 +51,6 @@ func main() {
 	fmt.Println("TEST STEP Prepare Secrets")
 
 	fmt.Println("\nTEST STEP Install app-toolkit")
-	//TODO: remove when we can use the official package repository
-	runCommand("tanzu package repository update projects.registry.vmware.com-tce-main-v0.11.0 -n tanzu-package-repo-global --url http://index.docker.io/ryanmattcollins/main@sha256:52da5141d10490fa755fb90e56141653160d8af2a9c0b3a37bf1acfd802cfc8b")
 	runCommand("tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.2.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml")
 	runCommand("/bin/bash wait_for_app_toolkit.sh")
 	fmt.Println("TEST STEP Install app-toolkit OK")
