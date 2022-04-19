@@ -27,3 +27,16 @@ secrets:
 - name: registry-credentials
 imagePullSecrets:
 - name: registry-credentials
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ootb-supply-chain-source-to-url-workload
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ootb-supply-chain-source-to-url-workload
+subjects:
+  - kind: ServiceAccount
+    name: #@ data..values.catographer_catalog.service_account
+    namespace: #@ data.values.developer_namespace
