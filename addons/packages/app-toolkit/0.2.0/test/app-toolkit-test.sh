@@ -19,6 +19,7 @@ function main() {
 	checkExecutables
 	updatePackageRepository
 	setupSecrets
+	installPackage
 	createWorkload
 	checkWorkload
 
@@ -69,10 +70,10 @@ function setupSecrets() {
 	echo "--- Setting Up Secrets : OK! ---"
 }
 
-function createWorkload() {
+function installPackage() {
 	echo "--- Installing App Toolkit : Start ---"
 
-	tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.2.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml -n $developerNamespace
+	tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.2.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml
 	validateCommand "tanzu package installed get app-toolkit -n tanzu-package-repo-global" "ReconcileSucceeded"
 
 	echo "--- Installing App Toolkit : OK! ---"
@@ -81,7 +82,7 @@ function createWorkload() {
 function createWorkload(){
 	echo "--- Creating the Workload : Start ---"
 
-	tanzu apps workload create tanzu-simple-web-app --git-repo https://github.com/vmware-tanzu/application-toolkit-sample-app --git-branch main --type=web --app tanzu-simple-web-app --yes
+	tanzu apps workload create tanzu-simple-web-app --git-repo https://github.com/vmware-tanzu/application-toolkit-sample-app --git-branch main --type=web --app tanzu-simple-web-app --yes -n $developerNamespace
 	watchCommand "tanzu apps workload tail tanzu-simple-web-app" "Build successful" 5
 
 	echo "--- Creating the Workload : OK! ---"
@@ -115,7 +116,8 @@ function watchCommand() {
 	count=0
 	echo "Waiting for '$cmd' to match '$match'"
 	until $($cmd 2&>1) | grep -q "${match}"; do
-		if [[ $count/60 > $timeout ]]; then
+		minutes=$(( $count / 60 ))
+		if [[ "$minutes" -gt "$timeout" ]]; then
 			fail "Timeout exceeded waiting for '$cmd' to return expected result"
 		fi
 		sleep $duration
@@ -135,7 +137,8 @@ function pollCommand() {
 		output=$($cmd 2>&1)
 		echo "$output" | grep -q "${match}"
 		flag=$?
-		if [[ $count/60 > $timeout ]]; then
+		minutes=$(( $count / 60 ))
+		if [[ "$minutes" -gt "$timeout" ]]; then
 			fail "Timeout exceeded polling for '$cmd' to return expected result"
 		fi
 		sleep $duration
