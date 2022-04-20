@@ -5,7 +5,6 @@
 
 set -eo pipefail
 
-workloadURL="http://tanzu-simple-web-app.test-namespace.127-0-0-1.sslip.io/"
 existingPackageRepo='projects.registry.vmware.com-tce-main-v0.11.0'
 packageRepoUrl=$1
 
@@ -13,6 +12,7 @@ registryServer=$(grep 'registry.server:' app-toolkit-values.yaml | awk '{print $
 registryUser=$(grep 'registry.username:' app-toolkit-values.yaml | awk '{print $NF}')
 registryPass=$(grep 'registry.password:' app-toolkit-values.yaml | awk '{print $NF}')
 developerNamespace=$(grep 'developer_namespace:' app-toolkit-values.yaml | awk '{print $NF}')
+workloadURL="http://tanzu-simple-web-app.${developerNamespace}.127-0-0-1.sslip.io/"
 
 function main() {
 	echo -e "=== APP TOOLKIT TEST - START ===\n"
