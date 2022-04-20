@@ -3,16 +3,19 @@
 # Copyright 2022 VMware Tanzu Community Edition contributors. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-set -euo pipefail
+set -eo pipefail
 
 workloadURL="http://tanzu-simple-web-app.test-namespace.127-0-0-1.sslip.io/"
-registryServer=$(grep 'server:' app-toolkit-values.yaml | awk '{print $2}')
-registryUser=$(grep 'kp_default_repository_username:' app-toolkit-values.yaml | awk '{print $2}')
-registryPass=$(grep 'kp_default_repository_password:' app-toolkit-values.yaml | awk '{print $2}')
-developerNamespace=$(grep 'developer_namespace:' app-toolkit-values.yaml | awk '{print $2}')
+existingPackageRepo='projects.registry.vmware.com-tce-main-v0.11.0'
+packageRepoUrl=$1
+
+registryServer=$(grep 'registry.server:' app-toolkit-values.yaml | awk '{print $NF}')
+registryUser=$(grep 'registry.username:' app-toolkit-values.yaml | awk '{print $NF}')
+registryPass=$(grep 'registry.password:' app-toolkit-values.yaml | awk '{print $NF}')
+developerNamespace=$(grep 'developer_namespace:' app-toolkit-values.yaml | awk '{print $NF}')
 
 function main() {
-	echo "=== APP TOOLKIT TEST - START ==="
+	echo -e "=== APP TOOLKIT TEST - START ===\n"
 
 	deleteExistingCluster
 	createCluster
@@ -23,7 +26,7 @@ function main() {
 	createWorkload
 	checkWorkload
 
-	echo "=== APP TOOLKIT TEST - PASSED! ==="
+	echo -e "\n=== APP TOOLKIT TEST - PASSED! ===\n"
 }
 
 function deleteExistingCluster {
@@ -40,7 +43,7 @@ function createCluster {
 }
 
 function checkExecutables() {
-	echo "--- Executables Check : Start ---"
+	echo -e "\n--- Executables Check : Start ---\n"
 
 	validateCommand "tanzu" "Tanzu CLI"
 	validateCommand "tanzu apps" "Applications on Kubernetes"
@@ -49,51 +52,53 @@ function checkExecutables() {
 	validateCommand "kubectl" "kubectl controls the Kubernetes cluster manager"
 	validateCommand "docker" "A self-sufficient runtime for containers"
 
-	echo "--- Executables Check : OK! ---"
+	echo -e "\n--- Executables Check : OK! ---\n"
 }
 
 function updatePackageRepository() {
-	existingPackageRepo='projects.registry.vmware.com-tce-main-v0.11.0'
-	packageRepoUrl='index.docker.io/ryanmattcollins/main@sha256:0bfca475ef9fb8bd4cc503811371a491fcf72c44a039831e9c29fb44567d4257'
-	echo "Updating '$existingPackageRepo' to use '$packageRepoUrl'"
-	tanzu package repository update $existingPackageRepo -n tanzu-package-repo-global --url $packageRepoUrl
+	if [ "$packageRepoUrl" != "" ]; then
+		echo "Updating '$existingPackageRepo' to use '$packageRepoUrl'"
+		tanzu package repository update $existingPackageRepo -n tanzu-package-repo-global --url $packageRepoUrl
+	else
+		echo "Using standard PackageRepo found in $existingPackageRepo"
+	fi
 }
 
 function setupSecrets() {
-	echo "--- Setting Up Secrets : Start ---"
+	echo -e "\n--- Setting Up Secrets : Start ---\n"
 
 	tanzu package install secretgen-controller --package-name secretgen-controller.community.tanzu.vmware.com --version 0.8.0
 	tanzu secret registry add registry-credentials --server $registryServer --username $registryUser --password $registryPass --export-to-all-namespaces --yes
 
 	validateCommand "tanzu secret registry list" "registry-credentials"
 
-	echo "--- Setting Up Secrets : OK! ---"
+	echo -e "\n--- Setting Up Secrets : OK! ---\n"
 }
 
 function installPackage() {
-	echo "--- Installing App Toolkit : Start ---"
+	echo -e "\n--- Installing App Toolkit : Start ---\n"
 
-	tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.2.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml
+	tanzu package install app-toolkit -p app-toolkit.community.tanzu.vmware.com -v 0.2.0 -n tanzu-package-repo-global -f app-toolkit-values.yaml --verbose 3
 	validateCommand "tanzu package installed get app-toolkit -n tanzu-package-repo-global" "ReconcileSucceeded"
 
-	echo "--- Installing App Toolkit : OK! ---"
+	echo -e "\n--- Installing App Toolkit : OK! ---\n"
 }
 
 function createWorkload(){
-	echo "--- Creating the Workload : Start ---"
+	echo -e "\n--- Creating the Workload : Start ---\n"
 
-	tanzu apps workload create tanzu-simple-web-app --git-repo https://github.com/vmware-tanzu/application-toolkit-sample-app --git-branch main --type=web --app tanzu-simple-web-app --yes -n $developerNamespace
-	watchCommand "tanzu apps workload tail tanzu-simple-web-app" "Build successful" 5
+	tanzu apps workload create tanzu-simple-web-app --git-repo https://github.com/cgsamp/tanzu-simple-web-app --git-branch main --type=web --app tanzu-simple-web-app --yes -n $developerNamespace
 
-	echo "--- Creating the Workload : OK! ---"
+	echo -e "\n--- Creating the Workload : OK! ---\n"
 }
 
 function checkWorkload(){
-	echo "--- Checking the Workload : Start ---"
+	echo -e "\n--- Checking the Workload : Start ---\n"
 	
-	pollCommand "curl $workloadURL" "Hello World" 5
+	pollCommand "tanzu apps workload list -n ${developerNamespace}" "Ready" 5
+	pollCommand "curl $workloadURL" "Hello" 1
 
-	echo "--- Checking the Workload : OK! ---"
+	echo -e "\n--- Checking the Workload : OK! ---\n"
 }
 
 function validateCommand() {
@@ -115,6 +120,7 @@ function watchCommand() {
 	duration=5
 	count=0
 	echo "Waiting for '$cmd' to match '$match'"
+	set +e
 	until $($cmd 2&>1) | grep -q "${match}"; do
 		minutes=$(( $count / 60 ))
 		if [[ "$minutes" -gt "$timeout" ]]; then
@@ -123,6 +129,10 @@ function watchCommand() {
 		sleep $duration
 		count=$((count+duration))
 	done
+	set -e
+	minutes=$(( $count / 60 ))
+	seconds=$(( $count % 60 ))
+	echo "Result returned after ${minutes}m${seconds}s"
 }
 
 function pollCommand() {
@@ -133,21 +143,27 @@ function pollCommand() {
 	count=0
 	flag=1
 	echo "Polling '$cmd' until it contains '$match'"
-	while [ $flag -ne 0] ; do
+
+	while [ $flag -ne 0 ] ; do
+		set +e
 		output=$($cmd 2>&1)
-		echo "$output" | grep -q "${match}"
+		echo "${output}" | grep "${match}"
 		flag=$?
+		set -e
 		minutes=$(( $count / 60 ))
-		if [[ "$minutes" -gt "$timeout" ]]; then
+		if [[ "$minutes" -ge "$timeout" ]]; then
 			fail "Timeout exceeded polling for '$cmd' to return expected result"
 		fi
 		sleep $duration
 		count=$((count+duration))
 	done
+	minutes=$(( $count / 60 ))
+	seconds=$(( $count % 60 ))
+	echo "Result returned after ${minutes}m${seconds}s"
 }
 
 function fail() {
-	echo "=== APP TOOLKIT TEST - FAILED! ==="
+	echo -e "\n=== APP TOOLKIT TEST - FAILED! ===\n"
 	echo "$1"
 	exit 1
 }
